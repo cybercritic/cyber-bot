@@ -23,7 +23,7 @@ namespace cyber_bot.cyber_bot
         private long lastAmount = 0;
         private DateTime lastRequest = new DateTime(0);
         private DateTime lastServerRequest = new DateTime(0);
-        private string cookieValue = "INS_WEBSITE_COOKIE";
+        private string cookieValue = "PUT_INS_WEBSITE_COOKIE_HERE";
 
         private int ServerTick = 0;
         private int ServerTarget = 1;
@@ -48,11 +48,17 @@ namespace cyber_bot.cyber_bot
             public string ServerName; 
         }
 
+        struct Quote
+        {
+            public string quote { get; set; }
+            public string link { get; set; }
+        }
+
         public CyberBot()
         {
             if (Settings.Default.masterCookie != null && Settings.Default.masterCookie.Length > 10)
                 this.cookieValue = Settings.Default.masterCookie;
-
+            
             //https://www.indiegogo.com/projects/infinity-battlescape#/backers
 
             //this.ParsePlayerNumber(Resources.test);
@@ -125,8 +131,8 @@ namespace cyber_bot.cyber_bot
             
 
             cmdService.CreateCommand("cookie").Parameter("cookie").Do(CookieCommand);
-            cmdService.CreateCommand("quote").Parameter("username").Do(QuoteCommand);
-            cmdService.CreateCommand("image").Parameter("topic").Do(ImageCommand);
+            cmdService.CreateCommand("quote").Parameter("username", ParameterType.Optional).Do(QuoteCommand);
+            cmdService.CreateCommand("image").Parameter("topic", ParameterType.Optional).Do(ImageCommand);
         }
 
         private void OnTimerAmountCheck(object source, ElapsedEventArgs e)
@@ -236,7 +242,7 @@ namespace cyber_bot.cyber_bot
             return result;
         }
 
-        private string GetRandomQuote(string username)
+        private Quote GetRandomQuote(string username)
         {
             try
             {
@@ -247,15 +253,25 @@ namespace cyber_bot.cyber_bot
                 //var json = JsonConvert.DeserializeObject(webPage);
                 //var actions = JsonConvert.DeserializeObject(json["actions"]);
 
-                List<string> quotes = new List<string>();
+                List<Quote> quotes = new List<Quote>();
                 foreach (JObject job in tmp["user_actions"])
                 {
                     try
                     {
-                        string s = job["excerpt"].ToString();
-                        while (s.IndexOf("<") != -1)
-                            s = s.Remove(s.IndexOf("<"), (s.IndexOf(">") + 1) - s.IndexOf("<"));
-                        quotes.Add(WebUtility.HtmlDecode(s));
+                        Quote quote = new Quote();
+
+                        string excerpt = job["excerpt"].ToString();
+                        string slug = job["slug"].ToString();
+                        string id = job["topic_id"].ToString();
+                        string num = job["post_number"].ToString();
+
+                        while (excerpt.IndexOf("<") != -1)
+                            excerpt = excerpt.Remove(excerpt.IndexOf("<"), (excerpt.IndexOf(">") + 1) - excerpt.IndexOf("<"));
+
+                        quote.quote = WebUtility.HtmlDecode(excerpt);
+                        quote.link = string.Format("https://forums.inovaestudios.com/t/{0}/{1}/{2}", slug, id, num);
+                     
+                        quotes.Add(quote);
                     }
                     catch { }
                 }
@@ -263,11 +279,11 @@ namespace cyber_bot.cyber_bot
                 if (quotes.Count > 0)
                     return quotes[this.rand.Next(quotes.Count)];
                 else
-                    return null;
+                    return new Quote();
             }
             catch
             {
-                return null;
+                return new Quote();
             }
         }
 
@@ -415,17 +431,24 @@ namespace cyber_bot.cyber_bot
 
         async Task QuoteCommand(CommandEventArgs e)
         {
+            string username = e.GetArg("username");
+
+            if(username.Length == 0)
+            {
+                await e.Channel.SendMessage("usage `!quote <username>`");
+                return;
+            }
+
             await e.Channel.SendMessage("looking...");
 
-            string username = e.GetArg("username");
-            string quote = this.GetRandomQuote(username);
+            Quote quote = this.GetRandomQuote(username);
 
-            if (quote == null)
+            if (quote.quote == null)
                 await e.Channel.SendMessage("Something went wrong, sorry");
-            else if(quote.Length == 0)
+            else if (quote.quote.Length == 0)
                 await e.Channel.SendMessage(string.Format("Nothing found, sorry."));
             else
-                await e.Channel.SendMessage(string.Format("```{0}```\n{1}", quote, username));
+                await e.Channel.SendMessage(string.Format("```{0}```\n<{1}>\n{2}", quote.quote, quote.link, username));
         }
 
         async Task EchoCommand(CommandEventArgs e)
@@ -443,9 +466,16 @@ namespace cyber_bot.cyber_bot
 
         async Task ImageCommand(CommandEventArgs e)
         {
+            string topic = e.GetArg("topic");
+
+            if (topic.Length == 0)
+            {
+                await e.Channel.SendMessage("usage `!image <topic>`");
+                return;
+            }
+
             await e.Channel.SendMessage("looking...");
 
-            string topic = e.GetArg("topic");
             string ext = "";
 
             GoogleImage googleImg = new GoogleImage();
@@ -650,7 +680,7 @@ namespace cyber_bot.cyber_bot
             //https://discordapp.com/oauth2/authorize?client_id=222670956630507522&scope=bot&permissions=0
             //you need your own code, check here
             //https://youtu.be/oE6alzUzcw4
-            await discordClient.Connect("DISCORD_BOT_AUTHENTICATION_TOKEN", TokenType.Bot);
+            await discordClient.Connect("DISCORD_AUTHENTICATION_TOKEN_HERE", TokenType.Bot);
         }
 
         private void Log(object sender, LogMessageEventArgs e)
