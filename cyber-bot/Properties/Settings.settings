@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="cyber_bot.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="masterCookie" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PnJLdaQ5aK6WieRWuazWzo7vGbaSDM7c6WnxJ4ovjQnkeRCKFU3mVYxsCjp6Zks2sVziqALriSBHoHyW8j1BYn8gH8vuWSE2vnse0GzKxzrClAgewhKwMxNz3Z9scZg7PxgYskXT91xtcJM2pNV0PDSXeVp8n14FsVVxFRtfQc3TrIQeEKxbIRmJtZ19DJz6Vs44dtvylwMOl1Hq0HCJdUIYb-yJrHxzLqb3G3CepD3kDKLImd5AGrAk9J3CdXSu3SRVYH_s2eBG7LQFkWeDvpRGIo5-1UayiGhbDYgI5kfKzzeVqeVzhK7mss-5ZstMe8n54Lh8p48EE7q-2AGrozFyzHyj6q3Vu1a8brJMmT7MlYqX0-3k0Qgv1-i0Qs3T5wVSxLcThTrT8GQTSwkvfrzUQNIdMdz5VDzXTL_8tYIhxMyoQhTmfYyflUSxOrgpS8qy3KuIFD3gy1BtjhvUNexCBOY</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
